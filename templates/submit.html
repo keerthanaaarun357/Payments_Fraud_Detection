@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Fraud Detection Result</h1>
+        
+        {% if result %}
+        <div class="result-container">
+            <div class="prediction-result {{ 'fraud' if result.prediction == 'Fraud' else 'safe' }}">
+                <h2>{{ result.prediction }}</h2>
+                <p class="confidence">Confidence: {{ "%.1f"|format(result.confidence * 100) }}%</p>
+            </div>
+            
+            <div class="probability-breakdown">
+                <h3>Probability Breakdown:</h3>
+                <div class="prob-item">
+                    <span>Not Fraud:</span>
+                    <div class="prob-bar">
+                        <div class="prob-fill safe" id="not-fraud-bar"></div>
+                    </div>
+                    <span>{{ "%.1f"|format(result.probability_not_fraud * 100) }}%</span>
+                </div>
+                <div class="prob-item">
+                    <span>Fraud:</span>
+                    <div class="prob-bar">
+                        <div class="prob-fill fraud" id="fraud-bar"></div>
+                    </div>
+                    <span>{{ "%.1f"|format(result.probability_fraud * 100) }}%</span>
+                </div>
+            </div>
+            
+            <div class="input-summary">
+                <h3>Transaction Details:</h3>
+                <ul>
+                    <li><strong>Step:</strong> {{ result.input_data.step }}</li>
+                    <li><strong>Type:</strong> {{ result.input_data.type }}</li>
+                    <li><strong>Amount:</strong> ${{ "%.2f"|format(result.input_data.amount) }}</li>
+                    <li><strong>Old Balance (Origin):</strong> ${{ "%.2f"|format(result.input_data.oldbalanceOrg) }}</li>
+                    <li><strong>New Balance (Origin):</strong> ${{ "%.2f"|format(result.input_data.newbalanceOrig) }}</li>
+                    <li><strong>Old Balance (Destination):</strong> ${{ "%.2f"|format(result.input_data.oldbalanceDest) }}</li>
+                    <li><strong>New Balance (Destination):</strong> ${{ "%.2f"|format(result.input_data.newbalanceDest) }}</li>
+                </ul>
+            </div>
+        </div>
+        
+        <script>
+            // Set progress bar widths using JavaScript
+            document.getElementById('not-fraud-bar').style.width = '{{ result.probability_not_fraud * 100 }}%';
+            document.getElementById('fraud-bar').style.width = '{{ result.probability_fraud * 100 }}%';
+        </script>
+        
+        {% else %}
+        <div class="error">
+            <h2>Error</h2>
+            <p>No prediction result available.</p>
+        </div>
+        {% endif %}
+        
+        <div class="navigation">
+            <a href="/predict" class="btn-back">← Make Another Prediction</a>
+            <a href="/" class="btn-home">🏠 Home</a>
+        </div>
+    </div>
+</body>
+</html>
